@@ -58,13 +58,16 @@ public:
     ray(vec o, vec d) : o(o), d(d){}
 }
 
+enum Refl_t{ DIFF, SPEC, REFR };
+
 class sphere{
 private:
     vec3 p, e, c;
     double rad;
+    Refl_t refl;
 
 public:
-    sphere(double rad_, vec p_, vec e_, vec_ c): rad(rad_), p(p_), e(e_), c(c_) {}
+    sphere(double rad_, vec p_, vec e_, vec c_, Refl_t refl_): rad(rad_), p(p_), e(e_), c(c_) , refl(refl_) {}
 
     double intersect(const ray &r) const
     {
