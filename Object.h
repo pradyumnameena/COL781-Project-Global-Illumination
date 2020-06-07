@@ -2,8 +2,6 @@
 
 #define OBJECT_H
 
-#include <cmath>
-
 class Object
 {
 public:
