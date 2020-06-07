@@ -50,4 +50,38 @@ public:
     }
 };
 
+class ray{
+private:
+    vec3 o, d;
+
+public:
+    ray(vec o, vec d) : o(o), d(d){}
+}
+
+class sphere{
+private:
+    vec3 p, e, c;
+    double rad;
+
+public:
+    sphere(double rad_, vec p_, vec e_, vec_ c): rad(rad_), p(p_), e(e_), c(c_) {}
+
+    double intersect(const ray &r) const
+    {
+        vec op = p - r.o;
+        double t;
+        double eps = 1e-4;
+        double b = op.dot(r.d);
+        double det = b*b - op.dot(op) + rad*rad;
+
+        if(det<0){
+            return 0;
+        }else{
+            det = sqrt(det);
+        }
+
+        return (t=b-det)>eps ? t : ((t=b+det)>eps ? t : 0);
+    }
+}
+
 #endif;
