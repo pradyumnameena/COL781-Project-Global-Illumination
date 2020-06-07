@@ -50,4 +50,6 @@ public:
     }
 };
 
+typedef vec3<float> vec3f;
+typedef vec3<int> vec3i;
 #endif;
