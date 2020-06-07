@@ -36,7 +36,7 @@ public:
 
     vec3 &normalize() const
     {
-        return *this = *this * (1 / norm(sqrt(norm())));
+        return *this = *this * (1 / sqrt(x * x + y * y + z * z));
     }
 };
 
