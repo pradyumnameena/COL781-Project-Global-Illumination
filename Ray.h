@@ -1,7 +1,7 @@
 #ifndef RAY_H
 #define RAY_H
 
-#include "math.h"
+#include "Math.h"
 
 class Ray
 {
