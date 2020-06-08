@@ -33,7 +33,7 @@ inline double clamp(double x)
 template <typename T>
 class vec3
 {
-private:
+public:
     T x, y, z;
 
 public:
@@ -68,6 +68,11 @@ public:
         return x * v.x + y * v.y + z * v.z;
     }
 
+    vec3 mult(const vec3 &v) const
+    {
+        return vec3(x*v.x, y*v.y, z*v.z);
+    }
+
     vec3 cross(const vec3 &v) const
     {
         return vec3(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);
@@ -76,4 +81,4 @@ public:
 
 typedef vec3<double> vec3d;
 typedef vec3<int> vec3i;
-#endif;
+#endif
