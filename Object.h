@@ -9,9 +9,9 @@ class Object
 public:
     Object(){};
     virtual ~Object();
-    virtual bool intersect() const = 0;
+    virtual double intersect() const = 0;
     Reflection_t type;
-    vec3f position, emission, color;
+    vec3d position, emission, color;
 };
 
 #endif
