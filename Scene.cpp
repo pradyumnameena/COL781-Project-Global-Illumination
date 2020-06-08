@@ -6,9 +6,12 @@
 
 Scene::Scene()
 {
-	// TO-DO
-	// not including anything now
-	// Add method to include spheres from file
+	scene_obj.resize(0);
+}
+
+Scene::Scene(Sphere sp[], int n)
+{
+	std::copy(sp, sp + n, scene_obj.begin());
 }
 
 vec3d Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi)
@@ -49,7 +52,10 @@ vec3d Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi)
 
 	if (++depth > 5)
 	{
-		// TO-Do if statement
+		if (erand48(Xi) < p)
+			f = f * (1 / p);
+		else
+			return obj.emission;
 	}
 
 	if (obj.type == DIFFUSE)
@@ -144,4 +150,21 @@ vec3d Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi)
 	}
 
 	return obj.emission + f.mult(slack);
+}
+
+bool Scene::intersect(const Ray &r, double &t, int &id)
+{
+	double t = infinity;
+	int n = scene_obj.size();
+	double d;
+	for (int i = n - 1; i--;)
+	{
+		d = scene_obj[i].intersect(r);
+		if (d && d < t)
+		{
+			t = d;
+			id = i;
+		}
+	}
+	return t < infinity;
 }

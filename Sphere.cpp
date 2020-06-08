@@ -1,10 +1,16 @@
 #include "Sphere.h"
 
-Sphere::Sphere(const double &rad, const vec3d &p, const vec3d &e, const vec3d &c, const Reflection_t &t) : Object(), radius(rad), radius2(rad * rad)
+Sphere::Sphere()
+{
+    radius = radius2 = 0;
+}
+
+Sphere::Sphere(const double &rad, const vec3d &p, const vec3d &e, const vec3d &c, const Reflection_t &t) : radius(rad), radius2(rad * rad)
 {
     position = p;
     emission = e;
     color = c;
+    type = t;
 }
 
 double Sphere::intersect(const Ray &r) const
