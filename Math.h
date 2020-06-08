@@ -58,9 +58,10 @@ public:
         return x * x + y * y + z * z;
     }
 
-    vec3 &normalize() const
+    vec3 &normalize()
     {
-        return *this = *this * (1 / sqrt(x * x + y * y + z * z));
+        (*this) = (*this) * (1 / sqrt(this->norm()));
+        return *this;
     }
 
     T dot(const vec3 &v) const
@@ -70,7 +71,7 @@ public:
 
     vec3 mult(const vec3 &v) const
     {
-        return vec3(x*v.x, y*v.y, z*v.z);
+        return vec3(x * v.x, y * v.y, z * v.z);
     }
 
     vec3 cross(const vec3 &v) const

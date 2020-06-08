@@ -17,4 +17,4 @@ enum Reflection_t
     REFRACTION
 };
 
-#endif;
+#endif
