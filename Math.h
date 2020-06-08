@@ -60,7 +60,11 @@ public:
 
     vec3 &normalize()
     {
-        (*this) = (*this) * (1 / sqrt(this->norm()));
+        T n = norm();
+        if (n > 0)
+        {
+            (*this) = (*this) * (1 / sqrt(n));
+        }
         return *this;
     }
 
