@@ -13,7 +13,7 @@ class Scene
 public:
     Scene();
     vector<Sphere> scene_obj;
-    vec3 ray_tracer(const Ray &r, int depth, unsigned short *xi);
+    vec3d ray_tracer(const Ray &r, int depth, unsigned short *xi);
 };
 
-#endif;
+#endif

@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include "Scene.h"
-// #include "Sphere.h"
-// #include "Math.h"
+#include "Math.h"
+#include "Sphere.h"
+#include "Ray.h"
 
 Scene::Scene()
 {
@@ -10,62 +11,62 @@ Scene::Scene()
 	// Add method to include spheres from file
 }
 
-vec3 Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi){
+vec3d Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi){
 	double d,t;
 	double inf = 1e20;
 
 	int id = 0;
-	int n = scene_obj.size();
+	int len = scene_obj.size();
 
-	for(int i = n;i--;){
-		if(d=scene_obj[i].intersect(r) && d<t){
+	for(int i = len;i--;){
+		d=scene_obj[i].intersect(r);
+		if(d<t){
 			t = d;
 			id = i;
 		}
 	}
 
 	if(d>=inf){
-		return vec3();
+		return vec3d();
 	}
 
 	const Sphere &obj = scene_obj[id];
-	vec3 x = r.origin + r.direction*t;
-	vec3 n = (x - obj.position).normalize();
-	vec3 f = obj.color;
-	vec3 nl = n;
+	vec3d x = r.origin + r.direction*t;
+	vec3d n = (x - obj.position).normalize();
+	vec3d f = obj.color;
+	vec3d nl = n;
 
 	if(n.dot(r.direction)>=0){
 		nl = n*-1;
 	}
 
-	double p = max(f.x, max(f,y,f.z));
+	double p = max(f.x, max(f.y,f.z));
 
 	if(++depth>5){
 		// TO-Do if statement
 	}
 
-	if(obj.type == DIFF){
+	if(obj.type == DIFFUSE){
 		double r1,r2,r2s;
 		r1 = 2 * M_PI * erand48(Xi);
 		r2 = erand48(Xi);
 		r2s = sqrt(r2);
 
-		vec3 w = nl;
-		vec3 u;
+		vec3d w = nl;
+		vec3d u,v;
 		
 		if(fabs(w.x)>0.1){
-			u = vec3(0,1);
+			u = vec3d(0,1);
 		}else{
-			u = vec3(1);
+			u = vec3d(1);
 		}
 
-		u = (u%w).normalize();
-		v = w%u;
-		vec3 d = (u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1-r2)).normalize();
+		u = (u.cross(w)).normalize();
+		v = w.cross(u);
+		vec3d d = (u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1-r2)).normalize();
 
-		Ray r2(x,d);
-		return obj.emission + f.mult(ray_tracer(r2,depth,Xi));
-	}else if(obj.type == SPEC){
+		return obj.emission + f.mult(ray_tracer(Ray(x,d),depth,Xi));
+	}else if(obj.type == SPECULAR){
 		Ray r3(x, r.direction - n*2*n.dot(r.direction));
 		return obj.emission + f.mult(ray_tracer(r3,depth,Xi));
 	}
@@ -73,7 +74,7 @@ vec3 Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi){
 	Ray reflectedRay(x, r.direction - n*2*n.dot(r.direction));
 
 	bool into = n.dot(nl)>0;
-	double nc,nt,nnt,ddn,cos2t
+	double nc,nt,nnt,ddn,cos2t;
 	int temp;
 	nc = 1;
 	nt = 1.5;
@@ -90,7 +91,7 @@ vec3 Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi){
 		return obj.emission + f.mult(ray_tracer(reflectedRay,depth,Xi));
 	}
 
-	vec3 tdir = (r.direction*nnt - n*temp*(ddn*nnt + sqrt(cos2t))).normalize();
+	vec3d tdir = (r.direction*nnt - n*temp*(ddn*nnt + sqrt(cos2t))).normalize();
 
 	double a,b,R0,c;
 	a = nt - nc;
@@ -108,7 +109,7 @@ vec3 Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi){
 	RP = Re/P;
 	TP = Tr/(1-P);
 
-	vec3 slack;
+	vec3d slack;
 	if(depth>2){
 		if(erand48(Xi)<P){
 			slack = ray_tracer(reflectedRay,depth,Xi)*RP;
