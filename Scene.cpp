@@ -11,31 +11,20 @@ Scene::Scene()
 
 Scene::Scene(Sphere sp[], int n)
 {
-	std::copy(sp, sp + n, scene_obj.begin());
+	scene_obj.resize(n);
+	for (int i = 0; i < n; i++)
+	{
+		scene_obj[i] = sp[i];
+	}
 }
 
 vec3d Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi)
 {
 	double d, t;
-	double inf = 1e20;
-
 	int id = 0;
-	int len = scene_obj.size();
-
-	for (int i = len; i--;)
-	{
-		d = scene_obj[i].intersect(r);
-		if (d < t)
-		{
-			t = d;
-			id = i;
-		}
-	}
-
-	if (d >= inf)
-	{
+	// cout << "Before for loop" << endl;
+	if (!intersect(r, t, id))
 		return vec3d();
-	}
 
 	const Sphere &obj = scene_obj[id];
 	vec3d x = r.origin + r.direction * t;
@@ -154,10 +143,10 @@ vec3d Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi)
 
 bool Scene::intersect(const Ray &r, double &t, int &id)
 {
-	double t = infinity;
+	double inf = t = 1e20;
 	int n = scene_obj.size();
 	double d;
-	for (int i = n - 1; i--;)
+	for (int i = n; i--;)
 	{
 		d = scene_obj[i].intersect(r);
 		if (d && d < t)
@@ -166,5 +155,5 @@ bool Scene::intersect(const Ray &r, double &t, int &id)
 			id = i;
 		}
 	}
-	return t < infinity;
+	return t < inf;
 }

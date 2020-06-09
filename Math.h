@@ -9,21 +9,21 @@ using namespace std;
 const double epsilon = 1e-4;
 const double infinity = std::numeric_limits<double>::max();
 
-bool solveQuadraticEquation(const double &a, const double &b, const double &c, double &r1, double &r2)
-{
-    double D = b * b - 4 * a * c;
-    if (D < 0)
-        return false;
-    else if (D == 0.0)
-        r1 = r2 = -0.5 * b / a;
-    else
-    {
-        double q = -0.5 * ((b < 0) ? (b - sqrt(D)) : (b + sqrt(D)));
-        r1 = q / a;
-        r2 = c / q;
-    }
-    return true;
-}
+// bool solveQuadraticEquation(const double &a, const double &b, const double &c, double &r1, double &r2)
+// {
+//     double D = b * b - 4 * a * c;
+//     if (D < 0)
+//         return false;
+//     else if (D == 0.0)
+//         r1 = r2 = -0.5 * b / a;
+//     else
+//     {
+//         double q = -0.5 * ((b < 0) ? (b - sqrt(D)) : (b + sqrt(D)));
+//         r1 = q / a;
+//         r2 = c / q;
+//     }
+//     return true;
+// }
 
 inline double clamp(double x)
 {
