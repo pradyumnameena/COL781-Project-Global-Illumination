@@ -1,0 +1,13 @@
+
+.DS_Store
+Reference Code/LICENSE.txt
+Reference Code/Makefile
+Reference Code/README
+Reference Code/result_25k.png
+Reference Code/smallpt.cpp
+Reference Code/smallpt4k.cpp
+Reference Code/smallPT1.ppt
+Reference Code/a.out
+Reference Code/image.ppm
+*.o
+*.out
