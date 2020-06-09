@@ -42,9 +42,7 @@ public:
     T x, y, z;
 
 public:
-    vec3() : x(0), y(0), z(0) {}
-    vec3(T _x, T _y, T _z) : x(_x), y(_y), z(_z) {}
-    vec3(T _v) : x(_v), y(_v), z(_v) {}
+    vec3(T _x = 0, T _y = 0, T _z = 0) : x(_x), y(_y), z(_z) {}
     vec3 operator+(const vec3 &v) const
     {
         return vec3(x + v.x, y + v.y, z + v.z);

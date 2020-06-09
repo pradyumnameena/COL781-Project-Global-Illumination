@@ -45,9 +45,8 @@ int main(int argc, const char *argv[])
             //Subpixel 2 x 2
             for (int sy = 0, i = (h - y - 1) * w + x; sy < 2; sy++)
             {
-                for (int sx = 0; sx < 2; sx++)
+                for (int sx = 0; sx < 2; sx++, r = vec3d())
                 {
-                    r = vec3d();
                     for (int s = 0; s < samples; s++)
                     {
                         double r1 = 2 * erand48(Xi);

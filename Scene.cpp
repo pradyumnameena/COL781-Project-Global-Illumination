@@ -60,12 +60,12 @@ vec3d Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi)
 		if (fabs(w.x) > 0.1)
 		{
 			// May be wrong. Need to be checked
-			u = vec3d(0, 1, 0);
+			u = vec3d(0, 1);
 		}
 		else
 		{
 			// May be wrong. Need to be checked
-			u = vec3d(1, 0, 0);
+			u = vec3d(1);
 		}
 
 		u = (u.cross(w)).normalize();
