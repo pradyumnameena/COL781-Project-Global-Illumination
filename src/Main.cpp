@@ -33,7 +33,7 @@ int main(int argc, const char *argv[])
         Sphere(600, vec3d(50, 681.6 - .27, 81.6), vec3d(12, 12, 12), vec3d(), DIFFUSE)     //Lite
     };
     // cout << "D Scene" << endl;
-    Scene mySceen(sp, 9);
+    Scene mySceen(sp, 9, vec3d(50, 60, 85), vec3d(M_PI * 10000, M_PI * 10000, M_PI * 10000));
 
     // cout << "scene created" << endl;
 #pragma omp parallel for schedule(dynamic, 1) private(r)

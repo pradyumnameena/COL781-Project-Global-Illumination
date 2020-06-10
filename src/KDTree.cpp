@@ -12,23 +12,28 @@ KDTree::KDTree()
 	// unsigned total;
 }
 
-bool KDTree::cmpx(const Photon*a, const Photon*b){
+bool KDTree::cmpx(const Photon *a, const Photon *b)
+{
 	return a->x.x < b->x.x;
 }
 
-bool KDTree::cmpy(const Photon*a, const Photon*b){
+bool KDTree::cmpy(const Photon *a, const Photon *b)
+{
 	return a->x.y < b->x.y;
 }
 
-bool KDTree::cmpz(const Photon*a, const Photon*b){
+bool KDTree::cmpz(const Photon *a, const Photon *b)
+{
 	return a->x.z < b->x.z;
 }
 
-int KDTree::sepaxis(Photon** photons, unsigned n){
+int KDTree::sepaxis(Photon **photons, unsigned n)
+{
 	vec3d l(1e20, 1e20, 1e20);
 	vec3d u(-1e20, -1e20, -1e20);
 
-	for(unsigned i = 0;i<n;++i){
+	for (unsigned i = 0; i < n; ++i)
+	{
 		l.x = std::min(photons[i]->x.x, l.x);
 		l.y = std::min(photons[i]->x.y, l.y);
 		l.z = std::min(photons[i]->x.z, l.z);
@@ -37,120 +42,161 @@ int KDTree::sepaxis(Photon** photons, unsigned n){
 		u.z = std::max(photons[i]->x.z, u.z);
 	}
 
-	vec3d w = u-l;
+	vec3d w = u - l;
 
-	if(w.x>w.y){
-		if(w.x>w.z){
+	if (w.x > w.y)
+	{
+		if (w.x > w.z)
+		{
 			return 0;
-		}else if(w.y>w.z){
+		}
+		else if (w.y > w.z)
+		{
 			return 1;
-		}else{
+		}
+		else
+		{
 			return 2;
 		}
-	}else{
-		if(w.y>w.z){
+	}
+	else
+	{
+		if (w.y > w.z)
+		{
 			return 1;
-		}else if(w.x>w.z){
+		}
+		else if (w.x > w.z)
+		{
 			return 0;
-		}else{
+		}
+		else
+		{
 			return 2;
 		}
 	}
 }
 
-void KDTree::build(Photon** buf, unsigned total_)
+void KDTree::build(Photon **buf, unsigned total_)
 {
 	total = total_;
-	photons = new Photon*[total];
-	nodes = new char[total/2];
+	photons = new Photon *[total];
+	nodes = new char[total / 2];
 	sep(buf, 0, total);
 }
 
-void KDTree::nearest(Photon** buf, double* dist, int n, const vec3d &x, double d2)
+void KDTree::nearest(Photon **buf, double *dist, int n, const vec3d &x, double d2)
 {
-	for(int i = 0;i<n;++i){
+	for (int i = 0; i < n; ++i)
+	{
 		buf[i] = NULL;
 		dist[i] = d2;
 	}
 	trav(buf, dist, n, x, 0);
 }
 
-void KDTree::sep(Photon** buf, unsigned i, unsigned n)
+void KDTree::sep(Photon **buf, unsigned i, unsigned n)
 {
-	if(n==1){
+	if (n == 1)
+	{
 		photons[i] = *buf;
-	}else if(n>1){
+	}
+	else if (n > 1)
+	{
 		int axis = sepaxis(buf, n);
-		if(axis==0){
-			std::sort(buf, buf+n, cmpx);
-		}else if(axis==1){
-			std::sort(buf, buf+n, cmpy);
-		}else{
-			std::sort(buf, buf+n, cmpz);
+		if (axis == 0)
+		{
+			std::sort(buf, buf + n, cmpx);
+		}
+		else if (axis == 1)
+		{
+			std::sort(buf, buf + n, cmpy);
+		}
+		else
+		{
+			std::sort(buf, buf + n, cmpz);
 		}
 
 		int m = median(n);
 		photons[i] = buf[m];
 		nodes[i] = axis;
 
-		sep(buf, i*2+1, m);
-		sep(buf+m+1, i*2+2, n-m-1);
+		sep(buf, i * 2 + 1, m);
+		sep(buf + m + 1, i * 2 + 2, n - m - 1);
 	}
 }
 
-void KDTree::trav(Photon** buf, double* dist, int n, const vec3d &x, unsigned i)
+void KDTree::trav(Photon **buf, double *dist, int n, const vec3d &x, unsigned i)
 {
-	if(i>=total){
+	if (i >= total)
+	{
 		return;
-	}else if(i*2+1<total){
+	}
+	else if (i * 2 + 1 < total)
+	{
 		int axis = nodes[i];
 		vec3d v = photons[i]->x;
-		double* pd2 = &dist[n-1];
+		double *pd2 = &dist[n - 1];
 		double e = 0;
 
-		if(axis==0){
+		if (axis == 0)
+		{
 			e = x.x - v.x;
-		}else if(axis==1){
+		}
+		else if (axis == 1)
+		{
 			e = x.y - v.y;
-		}else{
+		}
+		else
+		{
 			e = x.z - v.z;
 		}
 
-		if(e<0){
-			trav(buf, dist, n, x, i*2+1);
-			if(e*e < *(pd2)){
-				trav(buf, dist, n, x, i*2+2);
+		if (e < 0)
+		{
+			trav(buf, dist, n, x, i * 2 + 1);
+			if (e * e < *(pd2))
+			{
+				trav(buf, dist, n, x, i * 2 + 2);
 			}
-		}else{
-			trav(buf, dist, n, x, i*2+2);
-			if(e*e < *(pd2)){
-				trav(buf, dist, n, x, i*2+1);
+		}
+		else
+		{
+			trav(buf, dist, n, x, i * 2 + 2);
+			if (e * e < *(pd2))
+			{
+				trav(buf, dist, n, x, i * 2 + 1);
 			}
 		}
 	}
 
 	double e2 = (photons[i]->x - x).norm();
-	if(e2>=dist[n-1]){
+	if (e2 >= dist[n - 1])
+	{
 		return;
 	}
 
 	int l = 0;
 	int r = n;
 	int m;
-	while(l<r){
-		m = (l+r)/2;
-		if(e2 < dist[m]){
+	while (l < r)
+	{
+		m = (l + r) / 2;
+		if (e2 < dist[m])
+		{
 			r = m;
-		}else{
-			l = m+1;
+		}
+		else
+		{
+			l = m + 1;
 		}
 	}
-	
+
 	// the initialisation might be error (if yes try j = n)
-	int j = n-1;
-	while(j>l){
-		buf[j] = buf[j-1];
-		dist[j] = dist[j-1];
+	int j = n - 1;
+	while (j > l)
+	{
+		buf[j] = buf[j - 1];
+		dist[j] = dist[j - 1];
 		j--;
 	}
 

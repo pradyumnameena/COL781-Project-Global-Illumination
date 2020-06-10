@@ -11,3 +11,5 @@ Reference Code/a.out
 Reference Code/image.ppm
 *.o
 *.out
+*.ppm
+*.png
