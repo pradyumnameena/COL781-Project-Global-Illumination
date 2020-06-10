@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <algorithm>
-#include "KDTree.h"
-#include "Photon.h"
-#include "Math.h"
+#include "./../include/KDTree.h"
+#include "./../include/Photon.h"
+#include "./../include/Math.h"
 
 KDTree::KDTree()
 {

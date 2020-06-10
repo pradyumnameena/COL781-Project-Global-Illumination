@@ -1,7 +1,7 @@
-#include "Scene.h"
-#include "Math.h"
-#include "Sphere.h"
-#include "Ray.h"
+#include "./../include/Scene.h"
+#include "./../include/Math.h"
+#include "./../include/Sphere.h"
+#include "./../include/Ray.h"
 #include <iostream>
 
 using namespace std;
