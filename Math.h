@@ -35,6 +35,26 @@ inline int toInt(double x)
     return int(pow(clamp(x), 1 / 2.2) * 255 + .5);
 }
 
+inline int log_2(int x)
+{
+    int n; 
+    for (n=0; x>1; x>>=1,++n); 
+    return n;
+}
+
+inline int median(int n)
+{
+    int h = log_2(n);
+    int s = 1<<h;
+    int d = n-s;
+    int s2 = s/2;
+
+    if(s2>0 && d>=s2){
+        d = s2-1;
+    }
+    return s2+d;
+}
+
 template <typename T>
 class vec3
 {
