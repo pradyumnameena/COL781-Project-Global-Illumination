@@ -3,13 +3,15 @@
 #include "./../include/Math.h"
 #include "./../include/Sphere.h"
 #include "./../include/Ray.h"
+#include "./../include/KDTree.h"
+#include <iostream>
 
-Scene::Scene()
+Scene::Scene() : tree()
 {
 	scene_obj.resize(0);
 }
 
-Scene::Scene(Sphere sp[], int n, vec3d &pos, vec3d &pow)
+Scene::Scene(Sphere sp[], int n, vec3d pos, vec3d pow, int estimate = 0) : tree()
 {
 	scene_obj.resize(n);
 	for (int i = 0; i < n; i++)
@@ -18,6 +20,7 @@ Scene::Scene(Sphere sp[], int n, vec3d &pos, vec3d &pow)
 	}
 	lightPos = pos;
 	lightPow = pow;
+	numPhotons = estimate;
 }
 
 vec3d Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi)
@@ -52,7 +55,27 @@ vec3d Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi)
 	if (obj.type == DIFFUSE)
 	{
 		vec3d w = nl;
-		vec3d d = generateRandomDirection(w, Xi);
+		double r1, r2, r2s;
+		r1 = 2 * M_PI * erand48(Xi);
+		r2 = erand48(Xi);
+		r2s = sqrt(r2);
+
+		vec3d u, v;
+
+		if (fabs(w.x) > 0.1)
+		{
+			// May be wrong. Need to be checked
+			u = vec3d(0, 1);
+		}
+		else
+		{
+			// May be wrong. Need to be checked
+			u = vec3d(1);
+		}
+
+		u = (u.cross(w)).normalize();
+		v = w.cross(u);
+		vec3d d = (u * cos(r1) * r2s + v * sin(r1) * r2s + w * sqrt(1 - r2)).normalize();
 		return obj.emission + f.mult(ray_tracer(Ray(x, d), depth, Xi));
 	}
 	else if (obj.type == SPECULAR)
@@ -139,50 +162,29 @@ bool Scene::intersect(const Ray &r, double &t, int &id)
 	return t < inf;
 }
 
-vec3d Scene::generateRandomDirection(vec3d &w, unsigned short *Xi)
-{
-	double r1, r2, r2s;
-	r1 = 2 * M_PI * erand48(Xi);
-	r2 = erand48(Xi);
-	r2s = sqrt(r2);
-
-	vec3d u, v;
-
-	if (fabs(w.x) > 0.1)
-	{
-		// May be wrong. Need to be checked
-		u = vec3d(0, 1);
-	}
-	else
-	{
-		// May be wrong. Need to be checked
-		u = vec3d(1);
-	}
-
-	u = (u.cross(w)).normalize();
-	v = w.cross(u);
-	return (u * cos(r1) * r2s + v * sin(r1) * r2s + w * sqrt(1 - r2)).normalize();
-}
-
-void Scene::generatePhotonRay(Ray *r, vec3d *f, unsigned short *Xi)
+void Scene::generatePhotonRay(Ray *r, vec3d *f, int i)
 {
 	*f = lightPow;
 	r->origin = lightPos;
-	r->direction = generateRandomDirection(lightPos.normalize(), Xi);
+	double p = 2 * M_PI * hal(0, i);
+	double t = 2 * acos(sqrt(1.0 - hal(1, i)));
+	double st = sin(t);
+	r->direction = vec3d(cos(p) * st, cos(t), sin(p) * st);
 }
 
-vec3d Scene::photon_tracer(const Ray &r, int depth, bool m, const vec3d &fl, unsigned short *Xi)
+vec3d Scene::photon_tracer(const Ray &r, int depth, bool m, const vec3d &fl, int i)
 {
 	double d, t;
 	int id = 0;
+	int d3 = depth * 3;
 	// cout << "Before for loop" << endl;
-	if (!intersect(r, t, id))
+	if ((++depth * 3) >= 20 || !intersect(r, t, id))
 		return vec3d();
 
 	const Sphere &obj = scene_obj[id];
 	vec3d x = r.origin + r.direction * t;
 	vec3d n = (x - obj.position).normalize();
-	vec3d f = obj.color;
+	const vec3d &f = obj.color;
 	vec3d nl = n;
 
 	if (n.dot(r.direction) >= 0)
@@ -190,50 +192,71 @@ vec3d Scene::photon_tracer(const Ray &r, int depth, bool m, const vec3d &fl, uns
 		nl = n * -1;
 	}
 
-	double p = max(f.x, max(f.y, f.z));
-
-	if (++depth > 5)
-	{
-		if (erand48(Xi) < p)
-			f = f * (1 / p);
-		else
-			return obj.emission;
-	}
-
 	if (obj.type == DIFFUSE)
 	{
+		// std::cout << "Diffuse" << std::endl;
 		if (m)
 		{
 			Photon **b = (Photon **)alloca(sizeof(Photon *) * numPhotons);
 			double *r = (double *)alloca(sizeof(double) * numPhotons);
 			tree.nearest(b, r, numPhotons, x, infinity);
-			vec3d flux;
+			vec3d flux(0);
 			const double fr = 1.0 / M_PI;
 			int j, k;
-			for (j = 0, k = 0; j < numPhotons; k = j++)
+			for (j = k = 0; j < numPhotons; k = j++)
 			{
 				Photon *ph = b[j];
-				if (ph == nullptr)
+				if (!ph)
 				{
 					break;
 				}
 				flux = flux + ph->fl * fr;
 			}
+			// cout << "FLUX " << flux.x << " " << flux.y << " " << flux.z << endl;
 			return flux.mult(f) * (1.0 / (M_PI * r[k]));
 		}
 		Photon *q = new Photon(x, fl);
 		photons.push_back(q);
 
-		vec3d w = nl;
-		vec3d d = generateRandomDirection(w, Xi);
-		return photon_tracer(Ray(x, d), depth, m, f.mult(fl) * (1.0 / p), Xi);
+		double p = max(f.x, max(f.y, f.z));
+		if (hal(d3 + 1, i) >= p)
+		{
+			return vec3d();
+		}
+		vec3d &w = nl;
+
+		double r1, r2, r2s;
+		r1 = 2. * M_PI * hal(d3 - 1, i);
+		r2 = hal(d3 + 0, i);
+		r2s = sqrt(r2);
+
+		vec3d u, v;
+
+		if (fabs(w.x) > 0.1)
+		{
+			// May be wrong. Need to be checked
+			u = vec3d(0, 1);
+		}
+		else
+		{
+			// May be wrong. Need to be checked
+			u = vec3d(1);
+		}
+
+		u = (u.cross(w)).normalize();
+		v = w.cross(u);
+		vec3d d = (u * cos(r1) * r2s + v * sin(r1) * r2s + w * sqrt(1 - r2)).normalize();
+		// cout << "d: " << d.x << " " << d.y << " " << d.z << endl;
+		return photon_tracer(Ray(x, d), depth, m, f.mult(fl) * (1.0 / p), i);
 	}
 	else if (obj.type == SPECULAR)
 	{
+		// std::cout << "Specular" << std::endl;
 		Ray r3(x, r.direction - n * 2 * n.dot(r.direction));
-		return f.mult(photon_tracer(r3, depth, m, f.mult(fl), Xi));
+		return photon_tracer(r3, depth, m, f.mult(fl), i).mult(f);
 	}
 
+	// std::cout << "Refraction" << std::endl;
 	Ray reflectedRay(x, r.direction - n * 2 * n.dot(r.direction));
 
 	bool into = n.dot(nl) > 0;
@@ -253,7 +276,7 @@ vec3d Scene::photon_tracer(const Ray &r, int depth, bool m, const vec3d &fl, uns
 	cos2t = 1 - nnt * nnt * (1 - ddn * ddn);
 	if (cos2t < 0)
 	{
-		return photon_tracer(reflectedRay, depth, m, fl, Xi);
+		return photon_tracer(reflectedRay, depth, m, fl, i);
 	}
 
 	vec3d tdir = (r.direction * nnt - n * temp * (ddn * nnt + sqrt(cos2t))).normalize();
@@ -271,24 +294,21 @@ vec3d Scene::photon_tracer(const Ray &r, int depth, bool m, const vec3d &fl, uns
 	double Re, Tr, P, RP, TP;
 	Re = R0 + (1 - R0) * c * c * c * c * c;
 	Tr = 1 - Re;
-	P = 0.25 + 0.5 * Re;
-	RP = Re / P;
-	TP = Tr / (1 - P);
+	P = Re;
 
-	vec3d slack;
-	if (depth > 2)
+	if (m)
 	{
-		if (erand48(Xi) < P)
-		{
-			return photon_tracer(reflectedRay, depth, m, f.mult(fl), Xi) * RP;
-		}
-		else
-		{
-			return photon_tracer(Ray(x, tdir), depth, m, f.mult(fl), Xi) * TP;
-		}
+		return f.mult(photon_tracer(reflectedRay, depth, m, fl, i) * Re + photon_tracer(Ray(x, tdir), depth, m, fl, i) * Tr);
 	}
 	else
 	{
-		return photon_tracer(reflectedRay, depth, m, fl, Xi) * Re + photon_tracer(Ray(x, tdir), depth, m, fl, Xi) * Tr;
+		if (hal(d3 - 1, i) < P)
+		{
+			return photon_tracer(reflectedRay, depth, m, f.mult(fl), i);
+		}
+		else
+		{
+			return photon_tracer(Ray(x, tdir), depth, m, f.mult(fl), i);
+		}
 	}
 }

@@ -37,22 +37,24 @@ inline int toInt(double x)
 
 inline int log_2(int x)
 {
-    int n; 
-    for (n=0; x>1; x>>=1,++n); 
+    int n;
+    for (n = 0; x > 1; x >>= 1, ++n)
+        ;
     return n;
 }
 
 inline int median(int n)
 {
     int h = log_2(n);
-    int s = 1<<h;
-    int d = n-s;
-    int s2 = s/2;
+    int s = 1 << h;
+    int d = n - s;
+    int s2 = s / 2;
 
-    if(s2>0 && d>=s2){
-        d = s2-1;
+    if (s2 > 0 && d >= s2)
+    {
+        d = s2 - 1;
     }
-    return s2+d;
+    return s2 + d;
 }
 
 template <typename T>
