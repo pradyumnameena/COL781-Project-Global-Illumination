@@ -5,6 +5,7 @@
 #include "Math.h"
 #include "Ray.h"
 #include "Photon.h"
+#include "Snowman.h"
 #include "KDTree.h"
 #include <vector>
 
@@ -13,6 +14,7 @@ class Scene
 public:
     Scene();
     Scene(Sphere[], int, vec3d, vec3d, int);
+    void addSnowman(const Snowman &);
     vec3d ray_tracer(const Ray &, int, unsigned short *);
     vec3d photon_tracer(const Ray &, int, bool, const vec3d &, int);
     bool intersect(const Ray &, double &, int &);

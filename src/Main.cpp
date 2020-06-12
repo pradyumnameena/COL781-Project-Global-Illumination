@@ -2,6 +2,7 @@
 #include "./../include/Math.h"
 #include "./../include/Sphere.h"
 #include "./../include/Ray.h"
+#include "./../include/Snowman.h"
 #include <iostream>
 #include <fstream>
 
@@ -34,7 +35,7 @@ void GImain(int argc, const char *argv[])
     vec3d cx = vec3d(w * 0.5135 / h), cy = (cx.cross(camera.direction)).normalize() * 0.5135;
     vec3d r, *c = new vec3d[w * h];
 
-    Scene mySceen(sp, 9, vec3d(50, 60, 85), vec3d(M_PI * 10000, M_PI * 10000, M_PI * 10000), 0);
+    Scene myScene(sp, 9, vec3d(50, 60, 85), vec3d(M_PI * 10000, M_PI * 10000, M_PI * 10000), 0);
 
     // cout << "scene created" << endl;
 #pragma omp parallel for schedule(dynamic, 1) private(r)
@@ -57,7 +58,7 @@ void GImain(int argc, const char *argv[])
 
                         vec3d d = cx * (((sx + 0.5 + dx) / 2 + x) / w - 0.5) + cy * (((sy + 0.5 + dy) / 2 + y) / h - 0.5) + camera.direction;
 
-                        r = r + mySceen.ray_tracer(Ray(camera.origin + d * 140, d.normalize()), 0, Xi) * (1.0 / samples);
+                        r = r + myScene.ray_tracer(Ray(camera.origin + d * 140, d.normalize()), 0, Xi) * (1.0 / samples);
                         // cout << "Ray tracer done" << endl;
                     }
                     c[i] = c[i] + vec3d(clamp(r.x), clamp(r.y), clamp(r.z)) * 0.25;
@@ -89,7 +90,7 @@ void PMmain(int argc, const char *argv[])
         estimate = atoi(argv[2]);
     }
 
-    Scene mySceen(sp, 9, vec3d(50, 60, 85), vec3d(M_PI * 10000, M_PI * 10000, M_PI * 10000), estimate);
+    Scene myScene(sp, 9, vec3d(50, 60, 85), vec3d(M_PI * 10000, M_PI * 10000, M_PI * 10000), estimate);
 
     for (int i = 0; i < samples; i++)
     {
@@ -99,13 +100,13 @@ void PMmain(int argc, const char *argv[])
         fprintf(stderr, "\rPhoton Pass %5.2f%%", 100. * (i + 1) / samples);
         for (int j = 0; j < BKT; j++)
         {
-            mySceen.generatePhotonRay(&r, &f, m + j);
-            mySceen.photon_tracer(r, 0, false, f, m + j + 1);
+            myScene.generatePhotonRay(&r, &f, m + j);
+            myScene.photon_tracer(r, 0, false, f, m + j + 1);
         }
     }
-    fprintf(stderr, "\n#photons:%ld\nBuilding kd-tree...\n", mySceen.photons.size());
-    if (!mySceen.photons.empty())
-        mySceen.tree.build(&mySceen.photons[0], mySceen.photons.size());
+    fprintf(stderr, "\n#photons:%ld\nBuilding kd-tree...\n", myScene.photons.size());
+    if (!myScene.photons.empty())
+        myScene.tree.build(&myScene.photons[0], myScene.photons.size());
 
     Ray camera(vec3d(50, 52, 295.6), vec3d(0, -0.042612, -1).normalize());
     vec3d v = vec3d(0, -0.042612, -1).normalize();
@@ -126,7 +127,7 @@ void PMmain(int argc, const char *argv[])
                 for (int sx = 0; sx < 2; sx++)
                 {
                     vec3d d = cx * ((x + sx * 0.5 + 0.25) / w - 0.5) + cy * (-(y + sy * 0.5 + 0.25) / h + 0.5) + camera.direction;
-                    r = r + mySceen.photon_tracer(Ray(camera.origin + d * 140, d.normalize()), 0, true, dmy, 0);
+                    r = r + myScene.photon_tracer(Ray(camera.origin + d * 140, d.normalize()), 0, true, dmy, 0);
                 }
                 c[x + y * w] = r * s;
             }
