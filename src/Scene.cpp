@@ -32,7 +32,7 @@ void Scene::addSnowman(const Snowman &s)
 
 vec3d Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi)
 {
-	double d, t;
+	double t;
 	int id = 0;
 	// cout << "Before for loop" << endl;
 	if (!intersect(r, t, id))
@@ -181,7 +181,7 @@ void Scene::generatePhotonRay(Ray *r, vec3d *f, int i)
 
 vec3d Scene::photon_tracer(const Ray &r, int depth, bool m, const vec3d &fl, int i)
 {
-	double d, t;
+	double t;
 	int id = 0;
 	int d3 = depth * 3;
 	// cout << "Before for loop" << endl;
@@ -298,7 +298,7 @@ vec3d Scene::photon_tracer(const Ray &r, int depth, bool m, const vec3d &fl, int
 		c = 1 + ddn;
 	}
 
-	double Re, Tr, P, RP, TP;
+	double Re, Tr, P;
 	Re = R0 + (1 - R0) * c * c * c * c * c;
 	Tr = 1 - Re;
 	P = Re;
