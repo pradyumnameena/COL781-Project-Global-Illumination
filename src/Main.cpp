@@ -16,10 +16,21 @@ Sphere sp[] = {
     Sphere(1e5, vec3d(50, 40.8, -1e5 + 170), vec3d(), vec3d(), DIFFUSE),               //Frnt
     Sphere(1e5, vec3d(50, 1e5, 81.6), vec3d(), vec3d(.75, .75, .75), DIFFUSE),         //Botm
     Sphere(1e5, vec3d(50, -1e5 + 81.6, 81.6), vec3d(), vec3d(.75, .75, .75), DIFFUSE), //Top
-    Sphere(16.5, vec3d(27, 16.5, 47), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR),       //Mirr
-    Sphere(16.5, vec3d(73, 16.5, 78), vec3d(), vec3d(1, 1, 1) * .999, REFRACTION),     //Glas
-    Sphere(600, vec3d(50, 681.6 - .27, 81.6), vec3d(12, 12, 12), vec3d(), DIFFUSE)     //Lite
+    Sphere(600, vec3d(50, 681.6 - .27, 81.6), vec3d(12, 12, 12), vec3d(), DIFFUSE),     //Lite
+    // Sphere(16.5, vec3d(27, 16.5, 47), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR),       //Mirr (Left sphere)
+    // Sphere(16.5, vec3d(73, 16.5, 78), vec3d(), vec3d(1, 1, 1) * .999, REFRACTION),     //Glas (Right sphere)
+
+    // Surrounding spheres
+    // Starting from 3 o clock of snowman in clockwise order
+    Sphere(5, vec3d(90, 36, 80), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR),
+    Sphere(5, vec3d(70, 24, 100), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR),
+    Sphere(5, vec3d(30, 24, 100), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR),
+    Sphere(5, vec3d(10, 36, 80), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR),
 };
+
+Snowman s(10, vec3d(50, 46, 60), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR, 
+        18, vec3d(50, 18, 60), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR);
+int num_spheres = 11;
 
 void GImain(int argc, const char *argv[])
 {
@@ -31,11 +42,12 @@ void GImain(int argc, const char *argv[])
     }
 
     Ray camera(vec3d(50, 52, 295.6), vec3d(0, -0.042612, -1).normalize());
-    vec3d v = vec3d(0, -0.042612, -1).normalize();
+    // vec3d v = vec3d(0, -0.042612, -1).normalize();
     vec3d cx = vec3d(w * 0.5135 / h), cy = (cx.cross(camera.direction)).normalize() * 0.5135;
     vec3d r, *c = new vec3d[w * h];
 
-    Scene myScene(sp, 9, vec3d(50, 60, 85), vec3d(M_PI * 10000, M_PI * 10000, M_PI * 10000), 0);
+    Scene myScene(sp, num_spheres, vec3d(50, 60, 85), vec3d(M_PI * 10000, M_PI * 10000, M_PI * 10000), 0);
+    myScene.addSnowman(s);
 
     // cout << "scene created" << endl;
 #pragma omp parallel for schedule(dynamic, 1) private(r)
@@ -90,7 +102,8 @@ void PMmain(int argc, const char *argv[])
         estimate = atoi(argv[2]);
     }
 
-    Scene myScene(sp, 9, vec3d(50, 60, 85), vec3d(M_PI * 10000, M_PI * 10000, M_PI * 10000), estimate);
+    Scene myScene(sp, num_spheres, vec3d(50, 60, 85), vec3d(M_PI * 10000, M_PI * 10000, M_PI * 10000), estimate);
+    myScene.addSnowman(s);
 
     for (int i = 0; i < samples; i++)
     {
@@ -109,7 +122,7 @@ void PMmain(int argc, const char *argv[])
         myScene.tree.build(&myScene.photons[0], myScene.photons.size());
 
     Ray camera(vec3d(50, 52, 295.6), vec3d(0, -0.042612, -1).normalize());
-    vec3d v = vec3d(0, -0.042612, -1).normalize();
+    // vec3d v = vec3d(0, -0.042612, -1).normalize();
     vec3d cx = vec3d(w * 0.5135 / h), cy = (cx.cross(camera.direction)).normalize() * 0.5135;
     vec3d *c = new vec3d[w * h];
     // cout << "scene created" << endl;
@@ -142,6 +155,6 @@ void PMmain(int argc, const char *argv[])
 
 int main(int argc, const char *argv[])
 {
-    //GImain(argc, argv);
+    // GImain(argc, argv);
     PMmain(argc, argv);
 }
