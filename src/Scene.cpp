@@ -24,10 +24,10 @@ Scene::Scene(Sphere sp[], int n, vec3d pos, vec3d pow, int estimate = 0) : tree(
 }
 
 void Scene::addSnowman(const Snowman &s)
-{	
+{
 	scene_obj.resize(scene_obj.size() + 2);
-	scene_obj[scene_obj.size()-2] = s.lower;
-	scene_obj[scene_obj.size()-1] = s.upper;
+	scene_obj[scene_obj.size() - 2] = s.lower;
+	scene_obj[scene_obj.size() - 1] = s.upper;
 }
 
 vec3d Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi)

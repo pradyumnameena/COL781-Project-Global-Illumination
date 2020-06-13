@@ -1,33 +1,34 @@
 # Compiler Settings
 CXX = g++
-CXXFLAGS = -Wall -g
+CXXFLAGS = -fopenmp -Wall -g
 
 # Path variables
 LIB = ./include/
 SRC = ./src/
+OBJ = ./obj/
 
 # Target
 TARGET = main
 
 # Compilation rules
-main: Main.o Snowman.o Scene.o Sphere.o KDTree.o
-	$(CXX) $(CXXFLAGS) -o main Main.o Snowman.o Scene.o Sphere.o KDTree.o
+main: $(OBJ)Main.o $(OBJ)Snowman.o $(OBJ)Scene.o $(OBJ)Sphere.o $(OBJ)KDTree.o 
+	$(CXX) $(CXXFLAGS) $(OBJ)Main.o $(OBJ)Snowman.o $(OBJ)Scene.o $(OBJ)Sphere.o $(OBJ)KDTree.o -o Main
 
-Main.o: $(SRC)Main.cpp $(LIB)Scene.h $(LIB)Math.h $(LIB)Sphere.h $(LIB)Ray.h $(LIB)Snowman.h
-	$(CXX) $(CXXFLAGS) -c $(SRC)Main.cpp
+$(OBJ)Main.o: $(SRC)Main.cpp $(LIB)Scene.h $(LIB)Math.h $(LIB)Sphere.h $(LIB)Ray.h $(LIB)Snowman.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-Snowman.o: $(SRC)Snowman.cpp $(LIB)Snowman.h $(LIB)Sphere.h
-	$(CXX) $(CXXFLAGS) -c $(SRC)Snowman.cpp
+$(OBJ)Snowman.o: $(SRC)Snowman.cpp $(LIB)Snowman.h $(LIB)Sphere.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-Scene.o: $(SRC)Scene.cpp $(LIB)Scene.h $(LIB)Math.h $(LIB)Sphere.h $(LIB)Ray.h $(LIB)KDTree.h
-	$(CXX) $(CXXFLAGS) -c $(SRC)Scene.cpp
+$(OBJ)Scene.o: $(SRC)Scene.cpp $(LIB)Scene.h $(LIB)Math.h $(LIB)Sphere.h $(LIB)Ray.h $(LIB)KDTree.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-Sphere.o: $(SRC)Sphere.cpp $(LIB)Sphere.h
-	$(CXX) $(CXXFLAGS) -c $(SRC)Sphere.cpp
+$(OBJ)Sphere.o: $(SRC)Sphere.cpp $(LIB)Sphere.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-KDTree.o: $(SRC)KDTree.cpp $(LIB)KDTree.h $(LIB)Photon.h $(LIB)Math.h
-	$(CXX) $(CXXFLAGS) -c $(SRC)KDTree.cpp
+$(OBJ)KDTree.o: $(SRC)KDTree.cpp $(LIB)KDTree.h $(LIB)Photon.h $(LIB)Math.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Clean
 clean: 
-	$(RM) $(TARGET) *.o *~
+	$(RM) $(TARGET) -rf $(OBJ)/*
