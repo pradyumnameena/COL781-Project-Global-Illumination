@@ -14,6 +14,7 @@ class Scene
 public:
     Scene();
     Scene(Sphere[], int, vec3d, vec3d, int);
+    Scene(string, vec3d, vec3d, int);
     void addSnowman(const Snowman &);
     vec3d ray_tracer(const Ray &, int, unsigned short *);
     vec3d photon_tracer(const Ray &, int, bool, const vec3d &, int);

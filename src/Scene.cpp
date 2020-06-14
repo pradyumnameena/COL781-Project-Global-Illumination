@@ -23,6 +23,11 @@ Scene::Scene(Sphere sp[], int n, vec3d pos, vec3d pow, int estimate = 0) : tree(
 	numPhotons = estimate;
 }
 
+Scene::Scene(string file_path, vec3d pos, vec3d pow, int estimate = 0) : tree()
+{
+	// add non-snowman spheres via file
+}
+
 void Scene::addSnowman(const Snowman &s)
 {
 	scene_obj.resize(scene_obj.size() + 2);
