@@ -9,34 +9,35 @@
 using namespace std;
 
 Sphere sp[] = {
-    //Scene: radius, position, emission, color, material
+    //Walls
     Sphere(1e5, vec3d(1e5 + 1, 40.8, 81.6), vec3d(), vec3d(.75, .25, .25), DIFFUSE),   //Left
     Sphere(1e5, vec3d(-1e5 + 99, 40.8, 81.6), vec3d(), vec3d(.25, .25, .75), DIFFUSE), //Rght
     Sphere(1e5, vec3d(50, 40.8, 1e5), vec3d(), vec3d(.75, .75, .75), DIFFUSE),         //Back
-    Sphere(1e5, vec3d(50, 40.8, -1e5 + 170), vec3d(), vec3d(), DIFFUSE),               //Frnt
-    Sphere(1e5, vec3d(50, 1e5, 81.6), vec3d(), vec3d(.75, .75, .75), DIFFUSE),         //Botm
+    Sphere(1e5, vec3d(50, 40.8, -1e5 + 170), vec3d(), vec3d(), DIFFUSE),               //Front
+    Sphere(1e5, vec3d(50, 1e5, 81.6), vec3d(), vec3d(.75, .75, .75), DIFFUSE),         //Bottom
     Sphere(1e5, vec3d(50, -1e5 + 81.6, 81.6), vec3d(), vec3d(.75, .75, .75), DIFFUSE), //Top
-    Sphere(600, vec3d(50, 681.6 - .27, 81.6), vec3d(12, 12, 12), vec3d(), DIFFUSE),    //Lite
+    Sphere(600, vec3d(50, 681.6 - .27, 81.6), vec3d(12, 12, 12), vec3d(), DIFFUSE),    //Light
     // Sphere(16.5, vec3d(27, 16.5, 47), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR),       //Mirr (Left sphere)
     // Sphere(16.5, vec3d(73, 16.5, 78), vec3d(), vec3d(1, 1, 1) * .999, REFRACTION),     //Glas (Right sphere)
 
     // Surrounding spheres
     // Starting from 3 o clock of snowman in clockwise order
-    Sphere(5, vec3d(90, 36, 80), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR),
-    Sphere(5, vec3d(70, 24, 100), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR),
-    Sphere(5, vec3d(30, 24, 100), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR),
-    Sphere(5, vec3d(10, 36, 80), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR),
+    Sphere(5, vec3d(90, 36, 80), vec3d(), vec3d(1, 1, 1) * .999, REFRACTION),
+    Sphere(5, vec3d(70, 24, 100), vec3d(), vec3d(1, 1, 1) * .999, REFRACTION),
+    Sphere(5, vec3d(30, 24, 100), vec3d(), vec3d(1, 1, 1) * .999, REFRACTION),
+    Sphere(5, vec3d(10, 36, 80), vec3d(), vec3d(1, 1, 1) * .999, REFRACTION),
 };
 
 Snowman s(10, vec3d(50, 46, 60), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR,
           18, vec3d(50, 18, 60), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR);
+
 int num_spheres = 11;
 
 void GImain(int argc, const char *argv[])
 {
     int w = 1024, h = 768;
     int samples = 1;
-    if (argc == 2)
+    if (argc == 3)
     {
         samples = atoi(argv[1]) / 4;
     }
@@ -79,7 +80,7 @@ void GImain(int argc, const char *argv[])
         }
     }
     fprintf(stderr, "\n");
-    FILE *f = fopen("image.ppm", "w"); // Write image to PPM file.
+    FILE *f = fopen("resultGI.ppm", "w"); // Write image to PPM file.
     fprintf(f, "P3\n%d %d\n%d\n", w, h, 255);
     for (int i = 0; i < w * h; i++)
         fprintf(f, "%d %d %d ", toInt(c[i].x), toInt(c[i].y), toInt(c[i].z));
@@ -91,13 +92,13 @@ void PMmain(int argc, const char *argv[])
     int samples = 1;
     int BKT = 1000;
     int estimate = 10;
-    if (argc == 2)
+    if (argc == 3)
     {
         samples = atoi(argv[1]) / BKT;
         if (samples == 0)
             samples = 1;
     }
-    if (argc == 3)
+    if (argc == 4)
     {
         estimate = atoi(argv[2]);
     }
@@ -117,19 +118,19 @@ void PMmain(int argc, const char *argv[])
             myScene.photon_tracer(r, 0, false, f, m + j + 1);
         }
     }
-    fprintf(stderr, "\n#photons:%ld\nBuilding kd-tree...\n", myScene.photons.size());
+    fprintf(stderr, "\n#photons:%ld\nBuilding kd-tree\n", myScene.photons.size());
     if (!myScene.photons.empty())
         myScene.tree.build(&myScene.photons[0], myScene.photons.size());
 
+    fprintf(stderr, "Kd-tree build complete\n");
+
     Ray camera(vec3d(50, 52, 295.6), vec3d(0, -0.042612, -1).normalize());
-    // vec3d v = vec3d(0, -0.042612, -1).normalize();
     vec3d cx = vec3d(w * 0.5135 / h), cy = (cx.cross(camera.direction)).normalize() * 0.5135;
     vec3d *c = new vec3d[w * h];
-    // cout << "scene created" << endl;
 #pragma omp parallel for schedule(dynamic, 1)
     for (int y = 0; y < h; y++)
     {
-        fprintf(stderr, "\rRendering (%d spp) %5.2f%%", samples * 4, 100. * y / (h - 1));
+        fprintf(stderr, "\rRendering (%d samples) %5.2f%%", samples * BKT, 100. * y / (h - 1));
         for (int x = 0; x < w; x++)
         {
             //Subpixel 2 x 2
@@ -147,7 +148,7 @@ void PMmain(int argc, const char *argv[])
         }
     }
     fprintf(stderr, "\n");
-    FILE *f = fopen("image.ppm", "w"); // Write image to PPM file.
+    FILE *f = fopen("Result.ppm", "w"); // Write image to PPM file.
     fprintf(f, "P3\n%d %d\n%d\n", w, h, 255);
     for (int i = 0; i < w * h; i++)
         fprintf(f, "%d %d %d ", toInt(c[i].x), toInt(c[i].y), toInt(c[i].z));
@@ -155,6 +156,17 @@ void PMmain(int argc, const char *argv[])
 
 int main(int argc, const char *argv[])
 {
-    // GImain(argc, argv);
-    PMmain(argc, argv);
+    if (argv[1] == "-p")
+    {
+        PMmain(argc, argv);
+    }
+    else if (argv[1] == "-g")
+    {
+        GImain(argc, argv);
+    }
+    else
+    {
+        std::cerr << "Specify either -p [Samples] [Num Photon] (both optional) \n or -g [Num samples]" << std::endl;
+    }
+    return 0;
 }
