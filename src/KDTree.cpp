@@ -199,7 +199,7 @@ void KDTree::trav(Photon **buf, double *dist, int n, const vec3d &x, unsigned i)
 	}
 
 	// the initialisation might be error (if yes try j = n)
-	int j = n - 1;
+	// int j = n - 1;
 	for(int j = n-1;j>l;j--){
 		dist[j] = dist[j - 1];
 		buf[j] = buf[j - 1];

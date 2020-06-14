@@ -39,7 +39,7 @@ void GImain(int argc, const char *argv[])
     int samples = 1;
     if (argc == 3)
     {
-        samples = atoi(argv[1]) / 4;
+        samples = atoi(argv[2]) / 4;
     }
 
     Ray camera(vec3d(50, 52, 295.6), vec3d(0, -0.042612, -1).normalize());
@@ -94,13 +94,13 @@ void PMmain(int argc, const char *argv[])
     int estimate = 10;
     if (argc == 3)
     {
-        samples = atoi(argv[1]) / BKT;
+        samples = atoi(argv[2]) / BKT;
         if (samples == 0)
             samples = 1;
     }
     if (argc == 4)
     {
-        estimate = atoi(argv[2]);
+        estimate = atoi(argv[3]);
     }
 
     Scene myScene(sp, num_spheres, vec3d(50, 60, 85), vec3d(M_PI * 10000, M_PI * 10000, M_PI * 10000), estimate);
@@ -156,11 +156,13 @@ void PMmain(int argc, const char *argv[])
 
 int main(int argc, const char *argv[])
 {
-    if (argv[1] == "-p")
+    cout << argv[1] << endl;
+    string flag = argv[1];
+    if (flag == "-p")
     {
         PMmain(argc, argv);
     }
-    else if (argv[1] == "-g")
+    else if (flag == "-g")
     {
         GImain(argc, argv);
     }
