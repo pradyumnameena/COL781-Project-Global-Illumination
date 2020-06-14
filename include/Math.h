@@ -21,10 +21,17 @@ inline int toInt(double x)
 
 inline int log_2(int x)
 {
-    int n;
-    for (n = 0; x > 1; x >>= 1, ++n)
-        ;
+    int n = 0;
+    while(x>1){
+        n++;
+        x>>=1;
+    }
     return n;
+    
+    // int n;
+    // for (n = 0; x > 1; x >>= 1, ++n)
+    //     ;
+    // return n;
 }
 
 inline int median(int n)
