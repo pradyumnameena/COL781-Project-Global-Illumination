@@ -47,11 +47,11 @@ vec3d Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi)
 	vec3d x = r.origin + r.direction * t;
 	vec3d n = (x - obj.position).normalize();
 	vec3d f = obj.color;
-	vec3d nl = n;
+	vec3d n1 = n;
 
 	if (n.dot(r.direction) >= 0)
 	{
-		nl = n * -1;
+		n1 = n * -1;
 	}
 
 	double p = max(f.x, max(f.y, f.z));
@@ -66,7 +66,7 @@ vec3d Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi)
 
 	if (obj.type == DIFFUSE)
 	{
-		vec3d w = nl;
+		vec3d w = n1;
 		double r1, r2, r2s;
 		r1 = 2 * M_PI * erand48(Xi);
 		r2 = erand48(Xi);
@@ -98,12 +98,12 @@ vec3d Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi)
 
 	Ray reflectedRay(x, r.direction - n * 2 * n.dot(r.direction));
 
-	bool into = n.dot(nl) > 0;
+	bool into = n.dot(n1) > 0;
 	double nc, nt, nnt, ddn, cos2t;
 	int temp;
 	nc = 1;
 	nt = 1.5;
-	ddn = r.direction.dot(nl);
+	ddn = r.direction.dot(n1);
 	nnt = nt / nc;
 	temp = -1;
 	if (into)
@@ -197,11 +197,11 @@ vec3d Scene::photon_tracer(const Ray &r, int depth, bool m, const vec3d &fl, int
 	vec3d x = r.origin + r.direction * t;
 	vec3d n = (x - obj.position).normalize();
 	const vec3d &f = obj.color;
-	vec3d nl = n;
+	vec3d n1 = n;
 
 	if (n.dot(r.direction) >= 0)
 	{
-		nl = n * -1;
+		n1 = n * -1;
 	}
 
 	if (obj.type == DIFFUSE)
@@ -235,7 +235,7 @@ vec3d Scene::photon_tracer(const Ray &r, int depth, bool m, const vec3d &fl, int
 		{
 			return vec3d();
 		}
-		vec3d &w = nl;
+		vec3d &w = n1;
 
 		double r1, r2, r2s;
 		r1 = 2. * M_PI * hal(d3 - 1, i);
@@ -271,12 +271,12 @@ vec3d Scene::photon_tracer(const Ray &r, int depth, bool m, const vec3d &fl, int
 	// std::cout << "Refraction" << std::endl;
 	Ray reflectedRay(x, r.direction - n * 2 * n.dot(r.direction));
 
-	bool into = n.dot(nl) > 0;
+	bool into = n.dot(n1) > 0;
 	double nc, nt, nnt, ddn, cos2t;
 	int temp;
 	nc = 1;
 	nt = 1.5;
-	ddn = r.direction.dot(nl);
+	ddn = r.direction.dot(n1);
 	nnt = nt / nc;
 	temp = -1;
 	if (into)
