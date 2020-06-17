@@ -166,7 +166,6 @@ void PMmain(int argc, const char *argv[])
 
 int main(int argc, const char *argv[])
 {
-    cout << argv[1] << endl;
     string flag = argv[1];
     if (flag == "-p")
     {

@@ -14,11 +14,6 @@ inline double clamp(double x)
     return (x > 1) ? 1 : (x < 0) ? 0 : x;
 }
 
-inline int toInt(double x)
-{
-    return int(pow(clamp(x), 5.0 / 11.0) * 255 + .5);
-}
-
 inline int log_2(int x)
 {
     int n = 0;
@@ -27,6 +22,11 @@ inline int log_2(int x)
         x>>=1;
     }
     return n;
+}
+
+inline int toInt(double x)
+{
+    return int(pow(clamp(x), 5.0 / 11.0) * 255 + .5);
 }
 
 inline int median(int n)
