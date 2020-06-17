@@ -1,7 +1,7 @@
 # Compiler Settings
 CXX = g++
-CXXFLAGS = -fopenmp -Wall -g
-# CXXFLAGS = -openmp -Wall -g
+# CXXFLAGS = -fopenmp -Wall -g
+CXXFLAGS = -openmp -Wall -g
 
 # Path variables
 LIB = ./include/

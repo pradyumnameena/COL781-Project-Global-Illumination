@@ -22,10 +22,10 @@ Sphere sp[] = {
 
     // Surrounding spheres
     // Starting from 3 o clock of snowman in clockwise order
-    Sphere(5, vec3d(90, 36, 80), vec3d(), vec3d(1, 1, 1) * .999, REFRACTION),
-    Sphere(5, vec3d(70, 24, 100), vec3d(), vec3d(1, 1, 1) * .999, REFRACTION),
-    Sphere(5, vec3d(30, 24, 100), vec3d(), vec3d(1, 1, 1) * .999, DIFFUSE),
-    Sphere(5, vec3d(10, 36, 80), vec3d(), vec3d(1, 1, 1) * .999, DIFFUSE),
+    Sphere(5, vec3d(90, 36, 80), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR),
+    Sphere(5, vec3d(70, 24, 100), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR),
+    Sphere(5, vec3d(30, 24, 100), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR),
+    Sphere(5, vec3d(10, 36, 80), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR),
 };
 
 Snowman s(10, vec3d(50, 46, 60), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR,

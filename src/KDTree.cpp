@@ -86,18 +86,12 @@ void KDTree::build(Photon **buf, unsigned total_)
 
 void KDTree::nearest(Photon **buf, double *dist, int n, const vec3d &x, double d2)
 {
-	// Check for start and end conditions if error occurs
 	int i = 0;
 	while(i<n){
 		buf[i] = NULL;
 		dist[i] = d2;
 		i++;
 	}
-	// for (int i = 0; i < n; ++i)
-	// {
-	// 	buf[i] = NULL;
-	// 	dist[i] = d2;
-	// }
 	trav(buf, dist, n, x, 0);
 }
 
@@ -154,11 +148,11 @@ void KDTree::trav(Photon **buf, double *dist, int n, const vec3d &x, unsigned i)
 			e = x.z - v.z;
 		}
 
-		bool allow_condition = (e*e < *(pd2));
-		
+		bool allow_condition = true;
 		if (e >= 0)
 		{	
 			trav(buf, dist, n, x, i * 2 + 2);
+			allow_condition = (e*e < *(pd2));
 			if (allow_condition)
 			{
 				trav(buf, dist, n, x, i * 2 + 1);
@@ -167,6 +161,7 @@ void KDTree::trav(Photon **buf, double *dist, int n, const vec3d &x, unsigned i)
 		else
 		{
 			trav(buf, dist, n, x, i * 2 + 1);
+			allow_condition = (e*e < *(pd2));
 			if (allow_condition)
 			{
 				trav(buf, dist, n, x, i * 2 + 2);
@@ -201,10 +196,12 @@ void KDTree::trav(Photon **buf, double *dist, int n, const vec3d &x, unsigned i)
 	}
 
 	// the initialisation might be error (if yes try j = n)
-	// int j = n - 1;
-	for(int j = l;j<n-1;j++){
-		dist[j + 1] = dist[j];
-		buf[j + 1] = buf[j];
+	int j = n - 1;
+	while (j > l)
+	{
+		buf[j] = buf[j - 1];
+		dist[j] = dist[j - 1];
+		j--;
 	}
 
 	buf[l] = photons[i];
