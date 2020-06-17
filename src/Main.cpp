@@ -8,17 +8,17 @@
 
 using namespace std;
 
+int num_spheres = 11;
+
 Sphere sp[] = {
     //Walls
-    Sphere(1e5, vec3d(1e5 + 1, 40.8, 81.6), vec3d(), vec3d(.75, .25, .25), DIFFUSE),   //Left
-    Sphere(1e5, vec3d(-1e5 + 99, 40.8, 81.6), vec3d(), vec3d(.25, .25, .75), DIFFUSE), //Rght
-    Sphere(1e5, vec3d(50, 40.8, 1e5), vec3d(), vec3d(.75, .75, .75), DIFFUSE),         //Back
-    Sphere(1e5, vec3d(50, 40.8, -1e5 + 170), vec3d(), vec3d(), DIFFUSE),               //Front
-    Sphere(1e5, vec3d(50, 1e5, 81.6), vec3d(), vec3d(.75, .75, .75), DIFFUSE),         //Bottom
-    Sphere(1e5, vec3d(50, -1e5 + 81.6, 81.6), vec3d(), vec3d(.75, .75, .75), DIFFUSE), //Top
-    Sphere(600, vec3d(50, 681.6 - .27, 81.6), vec3d(12, 12, 12), vec3d(), DIFFUSE),    //Light
-    // Sphere(16.5, vec3d(27, 16.5, 47), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR),       //Mirr (Left sphere)
-    // Sphere(16.5, vec3d(73, 16.5, 78), vec3d(), vec3d(1, 1, 1) * .999, REFRACTION),     //Glas (Right sphere)
+    Sphere(1e5, vec3d(1e5 + 1, 40.8, 81.6), vec3d(), vec3d(.75, .25, .25), DIFFUSE),   
+    Sphere(1e5, vec3d(-1e5 + 99, 40.8, 81.6), vec3d(), vec3d(.25, .25, .75), DIFFUSE), 
+    Sphere(1e5, vec3d(50, 40.8, 1e5), vec3d(), vec3d(.75, .75, .75), DIFFUSE),         
+    Sphere(1e5, vec3d(50, 40.8, -1e5 + 170), vec3d(), vec3d(), DIFFUSE),               
+    Sphere(1e5, vec3d(50, 1e5, 81.6), vec3d(), vec3d(.75, .75, .75), DIFFUSE),         
+    Sphere(1e5, vec3d(50, -1e5 + 81.6, 81.6), vec3d(), vec3d(.75, .75, .75), DIFFUSE), 
+    Sphere(600, vec3d(50, 681.6 - .27, 81.6), vec3d(12, 12, 12), vec3d(), DIFFUSE), 
 
     // Surrounding spheres
     // Starting from 3 o clock of snowman in clockwise order
@@ -31,7 +31,6 @@ Sphere sp[] = {
 Snowman s(10, vec3d(50, 46, 60), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR,
           18, vec3d(50, 18, 60), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR);
 
-int num_spheres = 11;
 
 void GImain(int argc, const char *argv[])
 {
