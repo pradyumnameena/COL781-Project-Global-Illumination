@@ -103,11 +103,7 @@ void KDTree::nearest(Photon **buf, double *dist, int n, const vec3d &x, double d
 
 void KDTree::sep(Photon **buf, unsigned i, unsigned n)
 {
-	if (n == 1)
-	{
-		photons[i] = *buf;
-	}
-	else if (n > 1)
+	if (n > 1)
 	{
 		int axis = sepaxis(buf, n);
 		if (axis == 0)
@@ -130,15 +126,15 @@ void KDTree::sep(Photon **buf, unsigned i, unsigned n)
 		sep(buf, i * 2 + 1, m);
 		sep(buf + m + 1, i * 2 + 2, n - m - 1);
 	}
+	else if (n == 1)
+	{
+		photons[i] = *buf;
+	}
 }
 
 void KDTree::trav(Photon **buf, double *dist, int n, const vec3d &x, unsigned i)
 {
-	if (i >= total)
-	{
-		return;
-	}
-	else if (i * 2 + 1 < total)
+	if (i * 2 + 1 < total)
 	{
 		int axis = nodes[i];
 		vec3d v = photons[i]->x;
@@ -158,10 +154,12 @@ void KDTree::trav(Photon **buf, double *dist, int n, const vec3d &x, unsigned i)
 			e = x.z - v.z;
 		}
 
+		bool allow_condition = (e*e < *(pd2));
+		
 		if (e >= 0)
 		{	
 			trav(buf, dist, n, x, i * 2 + 2);
-			if (e * e < *(pd2))
+			if (allow_condition)
 			{
 				trav(buf, dist, n, x, i * 2 + 1);
 			}
@@ -169,11 +167,15 @@ void KDTree::trav(Photon **buf, double *dist, int n, const vec3d &x, unsigned i)
 		else
 		{
 			trav(buf, dist, n, x, i * 2 + 1);
-			if (e * e < *(pd2))
+			if (allow_condition)
 			{
 				trav(buf, dist, n, x, i * 2 + 2);
 			}
 		}
+	}
+	else if (i >= total)
+	{
+		return;
 	}
 
 	double e2 = (photons[i]->x - x).norm();
@@ -200,9 +202,9 @@ void KDTree::trav(Photon **buf, double *dist, int n, const vec3d &x, unsigned i)
 
 	// the initialisation might be error (if yes try j = n)
 	// int j = n - 1;
-	for(int j = n-1;j>l;j--){
-		dist[j] = dist[j - 1];
-		buf[j] = buf[j - 1];
+	for(int j = l;j<n-1;j++){
+		dist[j + 1] = dist[j];
+		buf[j + 1] = buf[j];
 	}
 
 	buf[l] = photons[i];
