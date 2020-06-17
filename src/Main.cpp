@@ -3,8 +3,8 @@
 #include "./../include/Sphere.h"
 #include "./../include/Ray.h"
 #include "./../include/Snowman.h"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 using namespace std;
 
@@ -12,25 +12,33 @@ int num_spheres = 11;
 
 Sphere sp[] = {
     //Walls
-    Sphere(1e5, vec3d(1e5 + 1, 40.8, 81.6), vec3d(), vec3d(.75, .25, .25), DIFFUSE),   
-    Sphere(1e5, vec3d(-1e5 + 99, 40.8, 81.6), vec3d(), vec3d(.25, .25, .75), DIFFUSE), 
-    Sphere(1e5, vec3d(50, 40.8, 1e5), vec3d(), vec3d(.75, .75, .75), DIFFUSE),         
+    Sphere(1e5, vec3d(50, -1e5 + 81.6, 81.6), vec3d(), vec3d(.75, .75, .75), DIFFUSE),
     Sphere(1e5, vec3d(50, 40.8, -1e5 + 170), vec3d(), vec3d(), DIFFUSE),               
-    Sphere(1e5, vec3d(50, 1e5, 81.6), vec3d(), vec3d(.75, .75, .75), DIFFUSE),         
-    Sphere(1e5, vec3d(50, -1e5 + 81.6, 81.6), vec3d(), vec3d(.75, .75, .75), DIFFUSE), 
+    Sphere(1e5, vec3d(50, 1e5, 81.6), vec3d(), vec3d(.75, .75, .75), DIFFUSE),            
+    Sphere(1e5, vec3d(-1e5 + 99, 40.8, 81.6), vec3d(), vec3d(.25, .25, .75), DIFFUSE), 
+    Sphere(1e5, vec3d(50, 40.8, 1e5), vec3d(), vec3d(.75, .75, .75), DIFFUSE),
+    Sphere(1e5, vec3d(1e5 + 1, 40.8, 81.6), vec3d(), vec3d(.75, .25, .25), DIFFUSE),          
     Sphere(600, vec3d(50, 681.6 - .27, 81.6), vec3d(12, 12, 12), vec3d(), DIFFUSE), 
 
     // Surrounding spheres
     // Starting from 3 o clock of snowman in clockwise order
     Sphere(5, vec3d(90, 36, 80), vec3d(), vec3d(1, 1, 1) * .999, REFRACTION),
     Sphere(5, vec3d(70, 24, 100), vec3d(), vec3d(1, 1, 1) * .999, REFRACTION),
-    Sphere(5, vec3d(30, 24, 100), vec3d(), vec3d(1, 1, 1) * .999, REFRACTION),
-    Sphere(5, vec3d(10, 36, 80), vec3d(), vec3d(1, 1, 1) * .999, REFRACTION),
+    Sphere(5, vec3d(30, 24, 100), vec3d(), vec3d(1, 1, 1) * .999, DIFFUSE),
+    Sphere(5, vec3d(10, 36, 80), vec3d(), vec3d(1, 1, 1) * .999, DIFFUSE),
 };
 
 Snowman s(10, vec3d(50, 46, 60), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR,
           18, vec3d(50, 18, 60), vec3d(), vec3d(1, 1, 1) * .999, SPECULAR);
 
+
+void printToFile(const char* file, int w, int h, vec3d *c){
+    FILE *f = fopen(file, "w"); // Write image to PPM file.
+    fprintf(f, "P3\n%d %d\n%d\n", w, h, 255);
+    for (int i = 0; i < w * h; i++){
+        fprintf(f, "%d %d %d ", toInt(c[i].x), toInt(c[i].y), toInt(c[i].z));
+    }
+}
 
 void GImain(int argc, const char *argv[])
 {
@@ -41,10 +49,11 @@ void GImain(int argc, const char *argv[])
         samples = atoi(argv[2]) / 4;
     }
 
+    vec3d r;
     Ray camera(vec3d(50, 52, 295.6), vec3d(0, -0.042612, -1).normalize());
-    // vec3d v = vec3d(0, -0.042612, -1).normalize();
-    vec3d cx = vec3d(w * 0.5135 / h), cy = (cx.cross(camera.direction)).normalize() * 0.5135;
-    vec3d r, *c = new vec3d[w * h];
+    vec3d cx = vec3d(w * 0.5135 / h);
+    vec3d cy = (cx.cross(camera.direction)).normalize() * 0.5135;
+    vec3d *c = new vec3d[w * h];
 
     Scene myScene(sp, num_spheres, vec3d(50, 60, 85), vec3d(M_PI * 10000, M_PI * 10000, M_PI * 10000), 0);
     myScene.addSnowman(s);
@@ -53,14 +62,17 @@ void GImain(int argc, const char *argv[])
 #pragma omp parallel for schedule(dynamic, 1) private(r)
     for (int y = 0; y < h; y++)
     {
-        fprintf(stderr, "\rRendering (%d spp) %5.2f%%", samples * 4, 100. * y / (h - 1));
-        for (unsigned short x = 0, Xi[3] = {0, 0, y * y * y}; x < w; x++)
+        unsigned short Xi[3] = {0, y * y * y, 0};
+        fprintf(stderr, "\rRendered (%d spp) %5.2f%%", samples * 4, 100. * y / (h - 1));
+        for (unsigned short x = 0; x < w; x++)
         {
             //Subpixel 2 x 2
-            for (int sy = 0, i = (h - y - 1) * w + x; sy < 2; sy++)
+            for (int sy = 0; sy < 2; sy++)
             {
-                for (int sx = 0; sx < 2; sx++, r = vec3d())
+                int i = (h - y - 1) * w + x;
+                for (int sx = 0; sx < 2; sx++)
                 {
+                    r = vec3d();
                     for (int s = 0; s < samples; s++)
                     {
                         double r1 = 2 * erand48(Xi);
@@ -73,16 +85,14 @@ void GImain(int argc, const char *argv[])
                         r = r + myScene.ray_tracer(Ray(camera.origin + d * 140, d.normalize()), 0, Xi) * (1.0 / samples);
                         // cout << "Ray tracer done" << endl;
                     }
-                    c[i] = c[i] + vec3d(clamp(r.x), clamp(r.y), clamp(r.z)) * 0.25;
+                    c[i] = (vec3d(clamp(r.x), clamp(r.y), clamp(r.z)) * 0.25) + c[i];
                 }
             }
         }
     }
     fprintf(stderr, "\n");
-    FILE *f = fopen("resultGI.ppm", "w"); // Write image to PPM file.
-    fprintf(f, "P3\n%d %d\n%d\n", w, h, 255);
-    for (int i = 0; i < w * h; i++)
-        fprintf(f, "%d %d %d ", toInt(c[i].x), toInt(c[i].y), toInt(c[i].z));
+    string fname = "imageGI" + to_string(samples * 4) + "samples.ppm";
+    printToFile(fname.c_str(), w, h, c);
 }
 
 void PMmain(int argc, const char *argv[])
@@ -147,10 +157,8 @@ void PMmain(int argc, const char *argv[])
         }
     }
     fprintf(stderr, "\n");
-    FILE *f = fopen("Result.ppm", "w"); // Write image to PPM file.
-    fprintf(f, "P3\n%d %d\n%d\n", w, h, 255);
-    for (int i = 0; i < w * h; i++)
-        fprintf(f, "%d %d %d ", toInt(c[i].x), toInt(c[i].y), toInt(c[i].z));
+    string fname = "imagePM" + to_string(samples) + "samples" + to_string(estimate) + "photons.ppm";
+    printToFile(fname.c_str(), w, h, c);
 }
 
 int main(int argc, const char *argv[])
@@ -167,7 +175,7 @@ int main(int argc, const char *argv[])
     }
     else
     {
-        std::cerr << "Specify either -p [Samples] [Num Photon] (both optional) \n or -g [Num samples]" << std::endl;
+        std::cerr<< "Specify either -p [Samples] [Num Photon] (both optional) \n or -g [Num samples]" << std::endl;
     }
     return 0;
 }
