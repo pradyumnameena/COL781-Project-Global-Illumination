@@ -43,7 +43,7 @@ public:
         double fct = f;
         while (j > 0)
         {
-            h += rev(j % p, p) * fct;
+            h += rev(p, j % p) * fct;
             j /= p;
             fct *= f;
         }

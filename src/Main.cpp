@@ -109,6 +109,9 @@ void PMmain(int argc, const char *argv[])
     }
     if (argc == 4)
     {
+        samples = atoi(argv[2]) / BKT;
+        if (samples == 0)
+            samples = 1;
         estimate = atoi(argv[3]);
     }
 
@@ -157,7 +160,7 @@ void PMmain(int argc, const char *argv[])
         }
     }
     fprintf(stderr, "\n");
-    string fname = "imagePM" + to_string(samples) + "samples" + to_string(estimate) + "photons.ppm";
+    string fname = "imagePM" + to_string(samples * BKT) + "samples" + to_string(estimate) + "photons.ppm";
     printToFile(fname.c_str(), w, h, c);
 }
 
