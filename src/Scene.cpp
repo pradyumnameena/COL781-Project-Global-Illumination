@@ -9,6 +9,7 @@
 Scene::Scene() : tree()
 {
 	scene_obj.resize(0);
+	generatePrimes(500);
 }
 
 Scene::Scene(Sphere sp[], int n, vec3d pos, vec3d pow, int estimate = 0) : tree()
@@ -21,12 +22,31 @@ Scene::Scene(Sphere sp[], int n, vec3d pos, vec3d pow, int estimate = 0) : tree(
 	lightPos = pos;
 	lightPow = pow;
 	numPhotons = estimate;
+	generatePrimes(500);
 }
 
-// Scene::Scene(string file_path, vec3d pos, vec3d pow, int estimate = 0) : tree()
-// {
-// 	// add non-snowman spheres via file
-// }
+void Scene::generatePrimes(int n)
+{
+	bool prime[n+1];
+	primes.resize(0);
+	for(int i = 0;i<=n;i++){
+		prime[i] = true;
+	}
+
+	for(int p = 2;p*p<=n;p++){
+		if(prime[p]==true){
+			for(int j = p*p;j<=n;j+=p){
+				prime[j] = false;
+			}
+		}
+	}
+
+	for(int p = 2;p<=n;p++){
+		if(prime[p]){
+			primes.push_back(p);
+		}
+	}
+}
 
 void Scene::addSnowman(const Snowman &s)
 {
@@ -37,14 +57,14 @@ void Scene::addSnowman(const Snowman &s)
 
 vec3d Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi)
 {
-	double t;
 	int id = 0;
+	double t;
 	// cout << "Before for loop" << endl;
 	if (!intersect(r, t, id))
 		return vec3d();
 
-	const Sphere &obj = scene_obj[id];
 	vec3d x = r.origin + r.direction * t;
+	const Sphere &obj = scene_obj[id];
 	vec3d n = (x - obj.position).normalize();
 	vec3d f = obj.color;
 	vec3d n1 = n;

@@ -14,7 +14,7 @@ class Scene
 public:
     Scene();
     Scene(Sphere[], int, vec3d, vec3d, int);
-    // Scene(string, vec3d, vec3d, int);
+    void generatePrimes(int);
     void addSnowman(const Snowman &);
     vec3d ray_tracer(const Ray &, int, unsigned short *);
     vec3d photon_tracer(const Ray &, int, bool, const vec3d &, int);
@@ -23,13 +23,11 @@ public:
     void generatePhotonRay(Ray *, vec3d *, int i);
     std::vector<Sphere> scene_obj;
     std::vector<Photon *> photons;
+    std::vector<int> primes;
     vec3d lightPos, lightPow;
     KDTree tree;
     int numPhotons;
-    int primes[61] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79,
-                      83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181,
-                      191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283};
-
+    
     inline int rev(const int p, const int i)
     {
         return (i == 0) ? i : p - i;
