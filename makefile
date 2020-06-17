@@ -1,7 +1,7 @@
 # Compiler Settings
 CXX = g++
-# CXXFLAGS = -fopenmp -Wall -g
-CXXFLAGS = -openmp -Wall -g
+CXXFLAGS = -fopenmp -Wall -g
+# CXXFLAGS = -openmp -Wall -g
 
 # Path variables
 LIB = ./include/
@@ -12,7 +12,7 @@ OBJ = ./obj/
 TARGET = main
 
 # Compilation rules
-main: $(OBJ)Main.o $(OBJ)Snowman.o $(OBJ)Scene.o $(OBJ)Sphere.o $(OBJ)KDTree.o 
+Main: $(OBJ)Main.o $(OBJ)Snowman.o $(OBJ)Scene.o $(OBJ)Sphere.o $(OBJ)KDTree.o 
 	$(CXX) $(CXXFLAGS) $(OBJ)Main.o $(OBJ)Snowman.o $(OBJ)Scene.o $(OBJ)Sphere.o $(OBJ)KDTree.o -o Main
 
 $(OBJ)Main.o: $(SRC)Main.cpp $(LIB)Scene.h $(LIB)Math.h $(LIB)Sphere.h $(LIB)Ray.h $(LIB)Snowman.h
