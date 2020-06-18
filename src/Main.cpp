@@ -12,13 +12,21 @@ int num_spheres = 11;
 
 Sphere sp[] = {
     //Walls
-    Sphere(1e5, vec3d(50, -1e5 + 81.6, 81.6), vec3d(), vec3d(.75, .75, .75), DIFFUSE),
-    Sphere(1e5, vec3d(50, 40.8, -1e5 + 170), vec3d(), vec3d(), DIFFUSE),               
-    Sphere(1e5, vec3d(50, 1e5, 81.6), vec3d(), vec3d(.75, .75, .75), DIFFUSE),            
-    Sphere(1e5, vec3d(-1e5 + 99, 40.8, 81.6), vec3d(), vec3d(.25, .25, .75), DIFFUSE), 
-    Sphere(1e5, vec3d(50, 40.8, 1e5), vec3d(), vec3d(.75, .75, .75), DIFFUSE),
-    Sphere(1e5, vec3d(1e5 + 1, 40.8, 81.6), vec3d(), vec3d(.75, .25, .25), DIFFUSE),          
-    Sphere(600, vec3d(50, 681.6 - .27, 81.6), vec3d(12, 12, 12), vec3d(), DIFFUSE), 
+    
+    // Ceiling
+    Sphere(1e5, vec3d(50, -1e5 + 81.6, 81.6), vec3d(), vec3d(0.3984375,0.796875,0), DIFFUSE),
+    // Camera side wall
+    Sphere(1e5, vec3d(50, 40.8, -1e5 + 170), vec3d(), vec3d(0.8,0.8,0.8), DIFFUSE),
+    // Floor
+    Sphere(1e5, vec3d(50, 1e5, 81.6), vec3d(), vec3d(0.15, 0.15, 0.75), DIFFUSE),            
+    // Right
+    Sphere(1e5, vec3d(-1e5 + 99, 40.8, 81.6), vec3d(), vec3d(0.15, 0.75, 0.15), DIFFUSE), 
+    // Front
+    Sphere(1e5, vec3d(50, 40.8, 1e5), vec3d(), vec3d(.7265625, .62890625, 0), DIFFUSE),
+    // Left
+    Sphere(1e5, vec3d(1e5 + 1, 40.8, 81.6), vec3d(), vec3d(0.75, 0.15, 0.15), DIFFUSE),          
+    // Ceiling Light
+    Sphere(600, vec3d(50, 681.6 - .27, 81.6), vec3d(12, 12, 12), vec3d(0.3,0.3,0.3), DIFFUSE), 
 
     // Surrounding spheres
     // Starting from 3 o clock of snowman in clockwise order
