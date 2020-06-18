@@ -138,7 +138,7 @@ void PMmain(int argc, const char *argv[])
             myScene.photon_tracer(r, 0, false, f, m + j + 1);
         }
     }
-    fprintf(stderr, "\n#photons:%ld\nBuilding kd-tree\n", myScene.photons.size());
+    fprintf(stderr,"\n");
     if (!myScene.photons.empty())
         myScene.tree.build(&myScene.photons[0], myScene.photons.size());
 
