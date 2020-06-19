@@ -140,6 +140,7 @@ vec3d Scene::ray_tracer(const Ray &r, int depth, unsigned short *Xi)
 
 	vec3d tdir = (r.direction * nnt - n * temp * (ddn * nnt + sqrt(cos2t))).normalize();
 
+	// Schlik approximation
 	double a, b, R0, c;
 	a = nt - nc;
 	b = nt + nc;
