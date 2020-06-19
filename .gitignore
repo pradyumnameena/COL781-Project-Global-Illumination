@@ -1,6 +1,5 @@
 .DS_Store
 *.o
 *.out
-*.ppm
 *.png
 Reference Code/*
